@@ -1,0 +1,33 @@
+#!/bin/sh
+#
+# An example hook script to check the commit log message.
+# Called by "git commit" with one argument, the name of the file
+# that has the commit message.  The hook should exit with non-zero
+# status after issuing an appropriate message if it wants to stop the
+# commit.  The hook is allowed to edit the commit message file.
+#
+# To enable this hook, rename this file to "commit-msg".
+
+# Uncomment the below to add a Signed-off-by line to the message.
+# Doing this in a hook is a bad idea in general, but the prepare-commit-msg
+# hook is more suited to it.
+#
+# SOB=$(git var GIT_AUTHOR_IDENT | sed -n 's/^\(.*>\).*$/Signed-off-by: \1/p')
+# grep -qs "^$SOB" "$1" || echo "$SOB" >> "$1"
+
+# This example catches duplicate Signed-off-by lines.
+
+# コミットコメントのチェック
+#   コミットメッセージが以下のフォーマットでない場合、コミットさせない
+#   [fix|hotfix|add|modify|change|clean|remove|upgrade|revert|refs] #(数字を一文字以上) メッセージを一文字以上
+if grep "\[\(fix\|hotfix\|add\|modify\|change\|clean\|remove\|upgrade\|revert\|refs\)\] \#\([0-9]\+\) \(.\+\)" $1 > /dev/null; then
+  exit 0
+else
+  echo "コミットコメントが不正です!!" 
+  echo "コミットコメントは \"(1行目)[{コミット種別}] #{チケット番号} (2行目)空白行 (3行目)コミット内容要約\" のフォーマットで入力してください。" 
+  echo "{コミット種別} : fix, hotfix, add, modify, change, clean, remove, upgrade, revert, refs のいずれかを格納" 
+  echo "{チケット番号} : 数値を格納" 
+
+  exit 1
+fi
+
